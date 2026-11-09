@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для Вас, Мой Самый Лучший... ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:ital,wght@0,300;0,400;0,600;1,300&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #09040e;
+            color: #fce7f3;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        .font-serif-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-card {
+            background: rgba(255, 182, 193, 0.07);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 182, 193, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .glass-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            border-color: rgba(244, 114, 182, 0.6);
+            box-shadow: 0 10px 30px rgba(244, 114, 182, 0.3);
+        }
+
+        /* Animated glowing pulse */
+        @keyframes subtle-glow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.08); }
+        }
+        .animate-glow {
+            animation: subtle-glow 4s ease-in-out infinite;
+        }
+
+        /* Floating particles */
+        @keyframes float-up {
+            0% { transform: translateY(105vh) scale(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.3) rotate(360deg); opacity: 0; }
+        }
+        .particle-heart {
+            position: absolute;
+            pointer-events: none;
+            animation: float-up linear infinite;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(9, 4, 14, 0.9);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(244, 114, 182, 0.5);
+            border-radius: 3px;
+        }
+
+        /* Smooth step transitions */
+        .step-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            display: none;
+        }
+        .step-section.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Relax Mode background pulse */
+        .relax-active-bg {
+            animation: relaxBgPulse 14s ease-in-out infinite alternate;
+        }
+        @keyframes relaxBgPulse {
+            0% { background-color: #09040e; }
+            50% { background-color: #170824; }
+            100% { background-color: #260724; }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative flex flex-col justify-between overflow-x-hidden transition-colors duration-1000">
+
+    <!-- Background Stars & Canvas Particle System -->
+    <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+    
+    <!-- Relax mode floating text layer -->
+    <div id="relaxTextLayer" class="fixed inset-0 pointer-events-none z-10 hidden flex items-center justify-center">
+        <p id="relaxQuote" class="font-handwriting text-3xl md:text-5xl text-pink-200 text-center px-6 transition-opacity duration-1000 opacity-0 max-w-3xl drop-shadow-[0_0_20px_rgba(244,114,182,0.8)]">
+            Вы — мой самый любимый человек во всей Вселенной...
+        </p>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="relative z-20 flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+
+        <!-- HEADER CONTROLS (Audio & Relax Mode Toggle) -->
+        <header class="fixed top-4 right-4 z-50 flex items-center gap-3">
+            <button id="relaxToggleBtn" class="glass-panel px-4 py-2 rounded-full text-xs md:text-sm font-medium flex items-center gap-2 hover:bg-pink-500/20 transition-all cursor-pointer">
+                <i class="fa-solid fa-moon text-pink-300"></i>
+                <span id="relaxBtnText">Relax Mode</span>
+            </button>
+            <button id="musicBtn" class="glass-panel p-3 rounded-full text-xs md:text-sm flex items-center justify-center hover:bg-pink-500/20 transition-all cursor-pointer w-10 h-10">
+                <i id="musicIcon" class="fa-solid fa-volume-xmark text-pink-300"></i>
+            </button>
+        </header>
+
+        <!-- PHASE 1: Intro (The Interactive Grass & Invitation) -->
+        <section id="phase1" class="step-section active flex-col items-center justify-center text-center min-h-[70vh] w-full max-w-2xl">
+            <div class="mb-6 animate-glow">
+                <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-pink-500/15 flex items-center justify-center border border-pink-400/40 shadow-[0_0_35px_rgba(244,114,182,0.4)]">
+                    <span class="text-4xl">⚽</span>
+                </div>
+            </div>
+            
+            <h1 class="font-serif-title text-4xl md:text-6xl text-white font-bold mb-4 tracking-wide leading-tight drop-shadow-md">
+                Для Вас, Милаш Мой...
+            </h1>
+            <p class="text-pink-200/90 text-base md:text-lg mb-8 max-w-md font-light leading-relaxed">
+                Погладьте волшебную траву внизу экрана или нажмите на кнопку, чтобы открыть мои самые сокровенные мысли о Вас...
+            </p>
+
+            <button id="startBtn" class="glass-panel group relative px-8 py-4 rounded-full text-lg font-semibold text-white tracking-wider hover:bg-pink-600/30 transition-all duration-300 border-pink-400/50 shadow-[0_0_25px_rgba(244,114,182,0.4)] hover:shadow-[0_0_40px_rgba(244,114,182,0.7)] cursor-pointer overflow-hidden">
+                <span class="relative z-10 flex items-center gap-3">
+                    Открыть моё сердце <i class="fa-solid fa-heart text-rose-400 group-hover:scale-125 transition-transform"></i>
+                </span>
+                <div class="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </button>
+        </section>
+
+
+        <!-- PHASE 2: Interactive Romantic Journey & Secrets -->
+        <section id="phase2" class="step-section flex-col items-center w-full max-w-4xl my-auto py-12">
+            
+            <!-- Navigation Tabs for Journey -->
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 glass-panel p-2 rounded-2xl">
+                <button class="journey-tab active px-4 py-2 rounded-xl text-xs md:text-sm font-medium transition-all cursor-pointer bg-pink-500/30 text-white" data-target="tab-flirt">
+                    ⚽ Мой Футболист
+                </button>
+                <button class="journey-tab px-4 py-2 rounded-xl text-xs md:text-sm font-medium transition-all cursor-pointer text-pink-200 hover:bg-pink-500/20" data-target="tab-jealousy">
+                    🔥 Как Вы ревнуете
+                </button>
+                <button class="journey-tab px-4 py-2 rounded-xl text-xs md:text-sm font-medium transition-all cursor-pointer text-pink-200 hover:bg-pink-500/20" data-target="tab-feelings">
+                    💖 Мой Первый и Единственный
+                </button>
+            </div>
+
+            <!-- Tab Content 1: Footballer & Flirt -->
+            <div id="tab-flirt" class="journey-content w-full flex flex-col items-center">
+                <h2 class="font-serif-title text-2xl md:text-4xl text-center mb-6 text-pink-100">Вы — мой самый лучший футболист ⚽❤️</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                        <i class="fa-solid fa-trophy text-3xl text-amber-300 mb-3"></i>
+                        <p class="text-sm leading-relaxed text-pink-100">Каждая Ваша победа — это мой восторг. Вы забиваете главные голы прямо в моё сердце!</p>
+                        <span class="text-xs text-pink-300/70 mt-4 block">01 / Мой Чемпион</span>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                        <i class="fa-solid fa-wand-magic-sparkles text-3xl text-pink-300 mb-3"></i>
+                        <p class="text-sm leading-relaxed text-pink-100">Милаш мой, Вы даже не представляете, как красиво Вы улыбаетесь и как сводите меня с ума...</p>
+                        <span class="text-xs text-pink-300/70 mt-4 block">02 / Флирт & Обаяние</span>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+                        <i class="fa-solid fa-crown text-3xl text-rose-300 mb-3"></i>
+                        <p class="text-sm leading-relaxed text-pink-100">Для меня Вы самый лучшая и красивая звезда на любом поле и в этой жизни!</p>
+                        <span class="text-xs text-pink-300/70 mt-4 block">03 / Гордость</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2: Cute Jealousy Secret Thoughts -->
+            <div id="tab-jealousy" class="journey-content w-full hidden flex-col items-center">
+                <h2 class="font-serif-title text-2xl md:text-4xl text-center mb-6 text-pink-100">О том, как мило Вы ревнуете... 🙈🔥</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+                    <div class="glass-panel p-6 rounded-2xl border-pink-400/30">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fa-solid fa-fire text-2xl text-rose-400"></i>
+                            <h3 class="font-semibold text-lg text-pink-100">Ваш строго-милый взгляд</h3>
+                        </div>
+                        <p class="text-sm leading-relaxed text-pink-200/90">
+                            Знаете, когда Вы начнете слегка ревновать — у меня внутри всё тает! Это так безумно мило, и в этот момент я чувствую, как сильно Вы мной дорожите.
+                        </p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border-pink-400/30">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fa-solid fa-lock text-2xl text-purple-300"></i>
+                            <h3 class="font-semibold text-lg text-pink-100">Только Ваш(а)</h3>
+                        </div>
+                        <p class="text-sm leading-relaxed text-pink-200/90">
+                            Ревнуйте меня хоть тысячу раз! Ведь всё моё сердце, все мои мысли и все мои чувства принадлежат без остатка только Вам одной(му)!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 3: The First Love Confession -->
+            <div id="tab-feelings" class="journey-content w-full hidden flex-col items-center">
+                <h2 class="font-serif-title text-2xl md:text-4xl text-center mb-4 text-pink-100">Вы — Первый, кого я ТАК люблю</h2>
+                <p class="text-xs text-pink-300/80 mb-6 text-center">Нажимайте на бутоны, чтобы прочитать записки с чувствами...</p>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full">
+                    <button class="garden-node glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer group" data-msg="Вы — первый человек в моей жизни, к кому у меня настолько глубокие и искренние чувства!">
+                        <i class="fa-solid fa-heart text-3xl text-pink-400 group-hover:scale-125 transition-transform duration-300"></i>
+                        <span class="text-xs text-pink-200">Первая Любовь</span>
+                    </button>
+                    <button class="garden-node glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer group" data-msg="Люблю Вас сейчас, буду любить завтра и буду любить всегда-всегда!">
+                        <i class="fa-solid fa-infinity text-3xl text-emerald-400 group-hover:scale-125 transition-transform duration-300"></i>
+                        <span class="text-xs text-pink-200">Навсегда</span>
+                    </button>
+                    <button class="garden-node glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer group" data-msg="Милаш мой, Вы заставляете меня улыбаться каждый день просто тем, что Вы есть!">
+                        <i class="fa-solid fa-face-smile-beam text-3xl text-amber-300 group-hover:scale-125 transition-transform duration-300"></i>
+                        <span class="text-xs text-pink-200">Моя Радость</span>
+                    </button>
+                    <button class="garden-node glass-card p-4 rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer group" data-msg="Никого и никогда я не любила так сильно, как люблю Вас!">
+                        <i class="fa-solid fa-sparkles text-3xl text-purple-400 group-hover:scale-125 transition-transform duration-300"></i>
+                        <span class="text-xs text-pink-200">Особенный Вы</span>
+                    </button>
+                </div>
+
+                <!-- Display message area -->
+                <div id="gardenMessage" class="mt-6 glass-panel p-4 rounded-xl text-center w-full min-h-[60px] flex items-center justify-center text-pink-100 font-handwriting text-2xl transition-all duration-300">
+                    Нажмите на карточку выше ✨
+                </div>
+            </div>
+
+            <!-- Transition to Final Button -->
+            <button id="toFinalBtn" class="mt-10 glass-panel px-8 py-3 rounded-full text-pink-200 hover:text-white border-pink-400/30 hover:bg-pink-500/20 transition-all flex items-center gap-3 cursor-pointer">
+                <span>Перейти к самому важному...</span>
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </button>
+
+        </section>
+
+        <!-- PHASE 3 / GRAND FINALE: Sweet Loving Confession -->
+        <section id="phaseFinale" class="step-section flex-col items-center justify-center text-center w-full max-w-2xl py-8">
+            <div class="glass-panel p-8 md:p-12 rounded-3xl border-2 border-pink-400/40 shadow-[0_0_50px_rgba(244,114,182,0.35)] relative overflow-hidden">
+                
+                <div class="absolute -top-24 -left-24 w-48 h-48 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="mb-4">
+                    <span class="text-5xl md:text-6xl animate-bounce inline-block">💖</span>
+                </div>
+
+                <h2 class="font-serif-title text-3xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-200 via-rose-300 to-pink-100 mb-6 leading-tight">
+                    Я Люблю Вас Больше Всех На Свете!
+                </h2>
+
+                <p class="text-pink-200/90 text-sm md:text-lg mb-8 font-light leading-relaxed">
+                    Вы мой самый лучший футболист, мой милаш и мой самый родной человек. Вы первый, кому принадлежит всё моё сердце, и это навсегда! ⚽✨
+                </p>
+
+                <!-- Interactive Hearts Fireworks Button -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
+                    <button id="loveExplosionBtn" class="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold text-lg shadow-[0_0_30px_rgba(244,114,182,0.6)] hover:scale-105 transition-all cursor-pointer">
+                        Запустить салют любви! ✨❤️
+                    </button>
+                </div>
+
+                <!-- Final Response text -->
+                <div id="finalResponse" class="hidden mt-8 p-4 rounded-2xl bg-pink-500/20 border border-pink-400/40 animate-fade-in">
+                    <p class="font-handwriting text-3xl text-pink-100">
+                        Вы — моё главное счастье! Люблю Вас бесконечно! 🥰💖⚽
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER: Interactive Wind-blown Grass Meadow Canvas -->
+    <footer class="relative w-full h-40 md:h-52 z-30 pointer-events-auto overflow-hidden">
+        <canvas id="grassCanvas" class="w-full h-full cursor-pointer"></canvas>
+        <div class="absolute bottom-2 left-0 right-0 text-center pointer-events-none">
+            <span class="text-[10px] text-pink-300/60 uppercase tracking-widest font-light">Погладьте траву • Relax Mode вверху</span>
+        </div>
+    </footer>
+
+    <script>
+        /* ----------------------------------------------------
+         * AUDIO SYSTEM (Ambient Synth Music Generator)
+         * ---------------------------------------------------- */
+        class AmbientSynth {
+            constructor() {
+                this.ctx = null;
+                this.isPlaying = false;
+                this.interval = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playChord() {
+                if (!this.ctx || !this.isPlaying) return;
+                
+                const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25];
+                const note = notes[Math.floor(Math.random() * notes.length)];
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(note, this.ctx.currentTime);
+
+                gain.gain.setValueAtTime(0, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.05, this.ctx.currentTime + 1.5);
+                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 5.0);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 5.2);
+            }
+
+            toggle() {
+                this.init();
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+                this.isPlaying = !this.isPlaying;
+
+                if (this.isPlaying) {
+                    this.playChord();
+                    this.interval = setInterval(() => this.playChord(), 2200);
+                } else {
+                    clearInterval(this.interval);
+                }
+                return this.isPlaying;
+            }
+        }
+
+        const synth = new AmbientSynth();
+        const musicBtn = document.getElementById('musicBtn');
+        const musicIcon = document.getElementById('musicIcon');
+
+        musicBtn.addEventListener('click', () => {
+            const active = synth.toggle();
+            if (active) {
+                musicIcon.className = 'fa-solid fa-volume-high text-pink-400';
+            } else {
+                musicIcon.className = 'fa-solid fa-volume-xmark text-pink-300';
+            }
+        });
+
+
+        /* ----------------------------------------------------
+         * STAR & HEART CANVAS BACKGROUND
+         * ---------------------------------------------------- */
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgWidth, bgHeight;
+        let bgParticles = [];
+        let isRelaxMode = false;
+
+        function resizeBgCanvas() {
+            bgWidth = bgCanvas.width = window.innerWidth;
+            bgHeight = bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeBgCanvas);
+        resizeBgCanvas();
+
+        class BgParticle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * bgWidth;
+                this.y = Math.random() * bgHeight;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedY = Math.random() * 0.3 + 0.1;
+                this.alpha = Math.random() * 0.7 + 0.2;
+                this.pulseSpeed = Math.random() * 0.02 + 0.005;
+                this.isHeart = Math.random() < 0.18;
+            }
+            update() {
+                this.y -= this.speedY * (isRelaxMode ? 0.5 : 1);
+                this.alpha += Math.sin(Date.now() * this.pulseSpeed) * 0.005;
+
+                if (this.y < -10) {
+                    this.y = bgHeight + 10;
+                    this.x = Math.random() * bgWidth;
+                }
+            }
+            draw() {
+                bgCtx.save();
+                bgCtx.globalAlpha = Math.max(0, Math.min(1, this.alpha));
+                
+                if (this.isHeart) {
+                    bgCtx.fillStyle = '#f472b6';
+                    bgCtx.font = `${Math.floor(this.size * 5 + 8)}px sans-serif`;
+                    bgCtx.fillText('♥', this.x, this.y);
+                } else {
+                    bgCtx.fillStyle = '#fce7f3';
+                    bgCtx.beginPath();
+                    bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    bgCtx.fill();
+                }
+                bgCtx.restore();
+            }
+        }
+
+        for (let i = 0; i < 75; i++) {
+            bgParticles.push(new BgParticle());
+        }
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgWidth, bgHeight);
+            bgParticles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+
+        /* ----------------------------------------------------
+         * INTERACTIVE GRASS MEADOW CANVAS
+         * ---------------------------------------------------- */
+        const grassCanvas = document.getElementById('grassCanvas');
+        const gCtx = grassCanvas.getContext('2d');
+        let gWidth, gHeight;
+        let blades = [];
+        let mouseX = -1000;
+        let touchForce = 0;
+
+        function resizeGrassCanvas() {
+            gWidth = grassCanvas.width = grassCanvas.parentElement.clientWidth;
+            gHeight = grassCanvas.height = grassCanvas.parentElement.clientHeight;
+            initGrass();
+        }
+
+        class Blade {
+            constructor(x) {
+                this.x = x;
+                this.height = Math.random() * (gHeight * 0.55) + (gHeight * 0.35);
+                this.angle = (Math.random() - 0.5) * 0.2;
+                this.targetAngle = this.angle;
+                this.stiffness = Math.random() * 0.03 + 0.02;
+                this.color = `hsl(${Math.random() * 40 + 320}, ${Math.random() * 30 + 50}%, ${Math.random() * 20 + 60}%)`;
+                this.width = Math.random() * 4 + 2;
+                this.flower = Math.random() < 0.15 ? (Math.random() < 0.5 ? '🌸' : '⚽') : null;
+            }
+
+            update() {
+                const wind = Math.sin(Date.now() * 0.002 + this.x) * 0.15;
+                const dist = Math.abs(mouseX - this.x);
+                let push = 0;
+                if (dist < 120) {
+                    push = ((120 - dist) / 120) * (mouseX > this.x ? -0.8 : 0.8) * (1 + touchForce);
+                }
+
+                this.targetAngle = wind + push;
+                this.angle += (this.targetAngle - this.angle) * this.stiffness;
+            }
+
+            draw() {
+                const tipX = this.x + Math.sin(this.angle) * this.height;
+                const tipY = gHeight - Math.cos(this.angle) * this.height;
+                const controlX = this.x + Math.sin(this.angle * 0.5) * (this.height * 0.5);
+                const controlY = gHeight - (this.height * 0.5);
+
+                gCtx.save();
+                gCtx.beginPath();
+                gCtx.moveTo(this.x, gHeight);
+                gCtx.quadraticCurveTo(controlX, controlY, tipX, tipY);
+                gCtx.strokeStyle = this.color;
+                gCtx.lineWidth = this.width;
+                gCtx.lineCap = 'round';
+                gCtx.stroke();
+
+                if (this.flower) {
+                    gCtx.font = '14px sans-serif';
+                    gCtx.fillText(this.flower, tipX - 7, tipY - 5);
+                }
+
+                gCtx.restore();
+            }
+        }
+
+        function initGrass() {
+            blades = [];
+            const count = Math.floor(gWidth / 6);
+            for (let i = 0; i < count; i++) {
+                blades.push(new Blade(i * 6 + Math.random() * 4));
+            }
+        }
+
+        function animateGrass() {
+            gCtx.clearRect(0, 0, gWidth, gHeight);
+            blades.forEach(blade => {
+                blade.update();
+                blade.draw();
+            });
+            if (touchForce > 0) touchForce *= 0.95;
+            requestAnimationFrame(animateGrass);
+        }
+
+        window.addEventListener('resize', resizeGrassCanvas);
+        resizeGrassCanvas();
+        animateGrass();
+
+        const handlePointerMove = (e) => {
+            const rect = grassCanvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            mouseX = clientX - rect.left;
+        };
+        const handlePointerTap = () => {
+            touchForce = 1.5;
+            createGrassSparkle(mouseX);
+        };
+
+        grassCanvas.addEventListener('mousemove', handlePointerMove);
+        grassCanvas.addEventListener('touchmove', handlePointerMove);
+        grassCanvas.addEventListener('click', handlePointerTap);
+
+        function createGrassSparkle(x) {
+            for (let i = 0; i < 5; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle-heart';
+                p.innerHTML = ['✨', '⚽', '💖'][Math.floor(Math.random() * 3)];
+                p.style.left = (x + (Math.random() * 40 - 20)) + 'px';
+                p.style.bottom = '80px';
+                p.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 2500);
+            }
+        }
+
+
+        /* ----------------------------------------------------
+         * PAGE NAVIGATION & INTERACTIVE PHASES
+         * ---------------------------------------------------- */
+        const phase1 = document.getElementById('phase1');
+        const phase2 = document.getElementById('phase2');
+        const phaseFinale = document.getElementById('phaseFinale');
+        const startBtn = document.getElementById('startBtn');
+        const toFinalBtn = document.getElementById('toFinalBtn');
+
+        function switchPhase(from, to) {
+            from.classList.remove('active');
+            setTimeout(() => {
+                from.style.display = 'none';
+                to.style.display = 'flex';
+                setTimeout(() => to.classList.add('active'), 50);
+            }, 800);
+        }
+
+        startBtn.addEventListener('click', () => {
+            switchPhase(phase1, phase2);
+            if (!synth.isPlaying) {
+                synth.toggle();
+                musicIcon.className = 'fa-solid fa-volume-high text-pink-400';
+            }
+        });
+
+        toFinalBtn.addEventListener('click', () => {
+            switchPhase(phase2, phaseFinale);
+        });
+
+
+        /* ----------------------------------------------------
+         * JOURNEY TABS SYSTEM (Phase 2)
+         * ---------------------------------------------------- */
+        const journeyTabs = document.querySelectorAll('.journey-tab');
+        const journeyContents = document.querySelectorAll('.journey-content');
+
+        journeyTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                journeyTabs.forEach(t => {
+                    t.classList.remove('bg-pink-500/30', 'text-white');
+                    t.classList.add('text-pink-200');
+                });
+                tab.classList.add('bg-pink-500/30', 'text-white');
+                tab.classList.remove('text-pink-200');
+
+                const targetId = tab.getAttribute('data-target');
+                journeyContents.forEach(c => {
+                    if (c.id === targetId) {
+                        c.classList.remove('hidden');
+                        c.classList.add('flex');
+                    } else {
+                        c.classList.add('hidden');
+                        c.classList.remove('flex');
+                    }
+                });
+            });
+        });
+
+        // Secret Notes Click Listener
+        const gardenNodes = document.querySelectorAll('.garden-node');
+        const gardenMessage = document.getElementById('gardenMessage');
+
+        gardenNodes.forEach(node => {
+            node.addEventListener('click', () => {
+                const msg = node.getAttribute('data-msg');
+                gardenMessage.style.opacity = '0';
+                setTimeout(() => {
+                    gardenMessage.innerText = `«${msg}»`;
+                    gardenMessage.style.opacity = '1';
+                }, 200);
+
+                for (let i = 0; i < 4; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'particle-heart';
+                    heart.innerHTML = ['⚽', '💖', '✨'][Math.floor(Math.random() * 3)];
+                    heart.style.left = (Math.random() * 80 + 10) + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 4000);
+                }
+            });
+        });
+
+
+        /* ----------------------------------------------------
+         * RELAX MODE TOGGLE & POETRY TIMER
+         * ---------------------------------------------------- */
+        const relaxToggleBtn = document.getElementById('relaxToggleBtn');
+        const relaxBtnText = document.getElementById('relaxBtnText');
+        const relaxTextLayer = document.getElementById('relaxTextLayer');
+        const relaxQuote = document.getElementById('relaxQuote');
+
+        const relaxQuotes = [
+            "Вы — мой самый лучший футболист и мой самый родной человек...",
+            "Вы первый, кого я так сильно люблю и буду любить всегда.",
+            "Мне так безумно нравится, когда Вы мило ревнуете...",
+            "Рядом с Вами весь мир становится добрым и светлым.",
+            "Люблю Вас, милаш мой! Вы — моё главное счастье.",
+            "Спасибо за то, что Вы просто есть в моей жизни!"
+        ];
+        let relaxQuoteIdx = 0;
+        let relaxInterval = null;
+
+        relaxToggleBtn.addEventListener('click', () => {
+            isRelaxMode = !isRelaxMode;
+            document.body.classList.toggle('relax-active-bg');
+
+            if (isRelaxMode) {
+                relaxBtnText.innerText = "Обычный режим";
+                relaxTextLayer.classList.remove('hidden');
+                
+                showNextRelaxQuote();
+                relaxInterval = setInterval(showNextRelaxQuote, 5000);
+            } else {
+                relaxBtnText.innerText = "Relax Mode";
+                relaxTextLayer.classList.add('hidden');
+                clearInterval(relaxInterval);
+            }
+        });
+
+        function showNextRelaxQuote() {
+            relaxQuote.style.opacity = '0';
+            setTimeout(() => {
+                relaxQuote.innerText = relaxQuotes[relaxQuoteIdx];
+                relaxQuote.style.opacity = '1';
+                relaxQuoteIdx = (relaxQuoteIdx + 1) % relaxQuotes.length;
+            }, 1000);
+        }
+
+
+        /* ----------------------------------------------------
+         * FINAL CONFETTI & LOVE FIREWORKS
+         * ---------------------------------------------------- */
+        const loveExplosionBtn = document.getElementById('loveExplosionBtn');
+        const finalResponse = document.getElementById('finalResponse');
+
+        loveExplosionBtn.addEventListener('click', () => {
+            finalResponse.classList.remove('hidden');
+            
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const p = document.createElement('div');
+                    p.className = 'particle-heart';
+                    p.innerHTML = ['⚽', '💖', '✨', '🌸', '❤️', '🏆'][Math.floor(Math.random() * 6)];
+                    p.style.left = (Math.random() * 90 + 5) + 'vw';
+                    p.style.fontSize = (Math.random() * 24 + 18) + 'px';
+                    p.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(p);
+                    setTimeout(() => p.remove(), 4500);
+                }, i * 70);
+            }
+        });
+
+    </script>
+</body>
+</html>
